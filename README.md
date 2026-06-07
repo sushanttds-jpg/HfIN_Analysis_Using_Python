@@ -21,9 +21,7 @@ using real NEPSE trading data.
 
 ---
 
-## Dashboard
 
-![HFIN Event Study Dashboard](hfin_event_study.png)
 
 ---
 
@@ -112,5 +110,5 @@ across NEPSE hotel stocks.
 ## About
 
 Built as part of my data science portfolio  
-@ School of Mathematical Sciences, Tribhuvan University  
+School of Mathematical Sciences, Tribhuvan University  
 📍 Kathmandu, Nepal | 🎯 Building toward Erasmus Mundus EMJM
