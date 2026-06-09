@@ -28,7 +28,7 @@ fig.suptitle("Hotel Forest Inn Ltd (HFIN) — NEPSE Market Analysis\n"
              fontsize=16, fontweight='bold', y=0.98)
 
 gs  = GridSpec(3, 2, figure=fig, hspace=0.4, wspace=0.28)
-ax1 = fig.add_subplot(gs[0, :])   # price — needs full width
+ax1 = fig.add_subplot(gs[0, :])   
 ax2 = fig.add_subplot(gs[1, 0])
 ax3 = fig.add_subplot(gs[1, 1])
 ax4 = fig.add_subplot(gs[2, 0])
@@ -178,7 +178,7 @@ for (row, col), cell in table.get_celld().items():
 
 ax5.set_title("Summary Statistics", fontweight='bold')
 
-ply.tight_layout(rect=[0, 0, 1, 0.96])
+ply.tight_layout(rect=[0, 0, 1, 1.96])
 ply.savefig('hfin_event_study.png', dpi=150, bbox_inches='tight')
 ply.show()
 print("Saved ")
