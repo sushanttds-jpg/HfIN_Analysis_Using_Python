@@ -28,7 +28,7 @@ fig.suptitle("Hotel Forest Inn Ltd (HFIN) — NEPSE Market Analysis\n"
              fontsize=16, fontweight='bold', y=0.98)
 
 gs  = GridSpec(3, 2, figure=fig, hspace=0.4, wspace=0.28)
-ax1 = fig.add_subplot(gs[0, 1])   
+ax1 = fig.add_subplot(gs[0, :])   
 ax2 = fig.add_subplot(gs[1, 0])
 ax3 = fig.add_subplot(gs[1, 1])
 ax4 = fig.add_subplot(gs[2, 0])
@@ -87,7 +87,6 @@ ax2.bar(df['Date'], df['Volume'],
 ax2.plot(df['Date'], df['VolMA7'],
          color='darkorange', linewidth=2, label='7-Day Vol MA')
 
-# annotate the distribution day — this is the key flaw signal
 max_vol_idx  = df['Volume'].idxmax()
 ax2.annotate(f"{df.loc[max_vol_idx,'Volume']:,.0f} shares\n(distribution?)",
              xy=(df.loc[max_vol_idx,'Date'], df.loc[max_vol_idx,'Volume']),
