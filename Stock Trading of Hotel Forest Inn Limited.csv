@@ -1,5 +1,5 @@
 //Data taken From : https://nepalstock.com.np/stock-trading
-//has updated till 2026-03-12 to 2026-06-29 :)
+//has updated till 2026-03-12 to 2026-06-30 :)
 
 BUSINESS DATE,CLOSE PRICE,HIGH PRICE,LOW PRICE,TOTAL TRADED QUANTITY,TOTAL TRADED VALUE,TOTAL TRADES
 2026-06-30,721,743.8,721,20249,14600000,698
