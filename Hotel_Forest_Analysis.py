@@ -4,9 +4,19 @@ import matplotlib.pyplot as ply
 from matplotlib.gridspec import GridSpec
 
 df = pd.read_csv('Stock Trading of Hotel Forest Inn Limited.csv',
+                 comment='/',
                  parse_dates=['BUSINESS DATE'])
 df.columns = ['Date','Close','High','Low','Volume','TradedValue','Trades']
 df = df.sort_values('Date').reset_index(drop=True)
+
+# Coerce numeric columns and filter non-trading days
+df['Close'] = pd.to_numeric(df['Close'], errors='coerce')
+df['High'] = pd.to_numeric(df['High'], errors='coerce')
+df['Low'] = pd.to_numeric(df['Low'], errors='coerce')
+df['Volume'] = pd.to_numeric(df['Volume'], errors='coerce')
+df['TradedValue'] = pd.to_numeric(df['TradedValue'], errors='coerce')
+df['Trades'] = pd.to_numeric(df['Trades'], errors='coerce')
+df = df.dropna(subset=['Close']).reset_index(drop=True)
 
 df['MA7']         = df['Close'].rolling(7).mean()
 df['MA14']        = df['Close'].rolling(14).mean()
