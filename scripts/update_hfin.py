@@ -314,23 +314,116 @@ def update_hfin_csv(
     return True, msg
 
 
+def record_holiday(
+    csv_path: Path,
+    holiday_date: Optional[str] = None,
+    dry_run: bool = False
+) -> Tuple[bool, str]:
+    """
+    Record a non-trading day (weekend or public holiday) in the CSV dataset.
+    Follows repository convention:
+      CLOSE PRICE: MARKET CLOSED
+      HIGH PRICE: WEEKEND
+      LOW PRICE: HOLIDAY
+      TOTAL TRADED QUANTITY: 0
+      TOTAL TRADED VALUE: 0
+      TOTAL TRADES: 0
+    """
+    if not holiday_date:
+        holiday_date = datetime.now(NEPAL_TZ).strftime("%Y-%m-%d")
+    else:
+        try:
+            datetime.strptime(holiday_date, "%Y-%m-%d")
+        except ValueError:
+            raise ValueError(f"Invalid holiday date format '{holiday_date}'. Expected YYYY-MM-DD.")
+
+    logger.info("Reading existing CSV at %s...", csv_path)
+    comment_lines, existing_rows = read_existing_csv(csv_path)
+
+    existing_dates = {r["BUSINESS DATE"].strip() for r in existing_rows if "BUSINESS DATE" in r}
+    if holiday_date in existing_dates:
+        msg = f"Record for date {holiday_date} already exists in CSV. No duplicate added."
+        logger.info(msg)
+        return False, msg
+
+    holiday_row = {
+        "BUSINESS DATE": holiday_date,
+        "CLOSE PRICE": "MARKET CLOSED",
+        "HIGH PRICE": "WEEKEND",
+        "LOW PRICE": "HOLIDAY",
+        "TOTAL TRADED QUANTITY": "0",
+        "TOTAL TRADED VALUE": "0",
+        "TOTAL TRADES": "0"
+    }
+
+    if dry_run:
+        msg = (f"[DRY-RUN] Would record holiday/market closure for {holiday_date}: "
+               f"{holiday_row['BUSINESS DATE']},{holiday_row['CLOSE PRICE']},{holiday_row['HIGH PRICE']},"
+               f"{holiday_row['LOW PRICE']},{holiday_row['TOTAL TRADED QUANTITY']},{holiday_row['TOTAL TRADED VALUE']},"
+               f"{holiday_row['TOTAL TRADES']}")
+        logger.info(msg)
+        return True, msg
+
+    all_rows = [holiday_row] + existing_rows
+    all_rows.sort(key=lambda x: x["BUSINESS DATE"], reverse=True)
+    newest_date = all_rows[0]["BUSINESS DATE"]
+
+    updated_comments: List[str] = []
+    for line in comment_lines:
+        if line.startswith("//has updated till"):
+            updated_comments.append(f"//has updated till 2026-03-11 to {newest_date}\n")
+        else:
+            updated_comments.append(line)
+
+    fieldnames = [
+        "BUSINESS DATE", "CLOSE PRICE", "HIGH PRICE", "LOW PRICE",
+        "TOTAL TRADED QUANTITY", "TOTAL TRADED VALUE", "TOTAL TRADES"
+    ]
+
+    temp_path = csv_path.with_suffix(".tmp")
+    with open(temp_path, mode="w", encoding="utf-8", newline="") as f:
+        for c in updated_comments:
+            f.write(c)
+        if updated_comments and not updated_comments[-1].endswith("\n\n"):
+            f.write("\n")
+        writer = csv.DictWriter(f, fieldnames=fieldnames, lineterminator="\n")
+        writer.writeheader()
+        for r in all_rows:
+            writer.writerow(r)
+
+    temp_path.replace(csv_path)
+    msg = f"Successfully recorded holiday/market closure for {holiday_date} in {csv_path.name}."
+    logger.info(msg)
+    return True, msg
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description="Update HFIN historical stock prices from YONEPSE public feed.")
     parser.add_argument("--csv-path", type=Path, default=DEFAULT_CSV_PATH, help="Path to HFIN CSV dataset")
     parser.add_argument("--endpoint", type=str, default=DEFAULT_FEED_URL, help="YONEPSE nepse_data.json URL")
     parser.add_argument("--manifest-url", type=str, default=DEFAULT_MANIFEST_URL, help="YONEPSE manifest.json URL")
     parser.add_argument("--status-url", type=str, default=DEFAULT_STATUS_URL, help="YONEPSE market status URL")
+    parser.add_argument("--holiday", nargs="?", const="", default=None,
+                        help="Record a weekend or holiday non-trading day (defaults to today in Asia/Kathmandu, or specify YYYY-MM-DD)")
     parser.add_argument("--dry-run", action="store_true", help="Simulate update and show diff without modifying CSV")
     args = parser.parse_args()
 
     try:
-        success, message = update_hfin_csv(
-            csv_path=args.csv_path,
-            feed_url=args.endpoint,
-            manifest_url=args.manifest_url,
-            status_url=args.status_url,
-            dry_run=args.dry_run
-        )
+        if args.holiday is not None:
+            holiday_date = args.holiday.strip() if args.holiday.strip() else None
+            success, message = record_holiday(
+                csv_path=args.csv_path,
+                holiday_date=holiday_date,
+                dry_run=args.dry_run
+            )
+        else:
+            success, message = update_hfin_csv(
+                csv_path=args.csv_path,
+                feed_url=args.endpoint,
+                manifest_url=args.manifest_url,
+                status_url=args.status_url,
+                dry_run=args.dry_run
+            )
         print(f"\nResult: {message}")
         sys.exit(0 if success else 1)
     except Exception as e:
