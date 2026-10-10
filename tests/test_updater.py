@@ -21,6 +21,7 @@ from unittest.mock import patch, MagicMock
 
 from scripts.update_hfin import (
     update_hfin_csv,
+    record_holiday,
     validate_hfin_record,
     find_hfin_record,
     fetch_json,
