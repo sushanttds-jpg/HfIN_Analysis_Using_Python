@@ -243,6 +243,36 @@ class TestHfinUpdater(unittest.TestCase):
             update_hfin_csv(self.csv_path, dry_run=False)
         self.assertEqual(self.csv_path.read_text(encoding="utf-8"), initial_content)
 
+    def test_record_holiday_successful(self):
+        success, msg = record_holiday(self.csv_path, holiday_date="2026-10-10", dry_run=False)
+        self.assertTrue(success)
+        self.assertIn("Successfully recorded holiday/market closure", msg)
+
+        lines = self.csv_path.read_text(encoding="utf-8").strip().splitlines()
+        # Header comments updated
+        self.assertTrue(any("2026-10-10" in line for line in lines[:3]))
+        # First data row is the holiday row
+        header_idx = [i for i, line in enumerate(lines) if line.startswith("BUSINESS DATE")][0]
+        first_row = lines[header_idx + 1]
+        self.assertEqual(first_row, "2026-10-10,MARKET CLOSED,WEEKEND,HOLIDAY,0,0,0")
+
+    def test_record_holiday_duplicate(self):
+        # 2026-07-31 already exists in SAMPLE_CSV_CONTENT
+        success, msg = record_holiday(self.csv_path, holiday_date="2026-07-31", dry_run=False)
+        self.assertFalse(success)
+        self.assertIn("already exists", msg)
+
+    def test_record_holiday_dry_run(self):
+        initial_content = self.csv_path.read_text(encoding="utf-8")
+        success, msg = record_holiday(self.csv_path, holiday_date="2026-10-10", dry_run=True)
+        self.assertTrue(success)
+        self.assertIn("[DRY-RUN]", msg)
+        self.assertEqual(self.csv_path.read_text(encoding="utf-8"), initial_content)
+
+    def test_record_holiday_invalid_date(self):
+        with self.assertRaises(ValueError):
+            record_holiday(self.csv_path, holiday_date="10-10-2026", dry_run=False)
+
 
 if __name__ == "__main__":
     unittest.main()
