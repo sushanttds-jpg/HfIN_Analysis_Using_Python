@@ -75,6 +75,15 @@ python3 scripts/update_hfin.py --dry-run
 python3 scripts/update_hfin.py
 ```
 
+**3. Record Weekend / Public Holiday:**
+```bash
+# Record today as non-trading / holiday:
+python3 scripts/update_hfin.py --holiday
+
+# Or record a specific date:
+python3 scripts/update_hfin.py --holiday 2026-10-11
+```
+
 ---
 
 ## 🧪 Running Tests
