@@ -191,9 +191,9 @@ def read_existing_csv(csv_path: Path) -> Tuple[List[str], List[Dict[str, str]]]:
     csv_text_lines: List[str] = []
     for line in lines:
         stripped = line.strip()
-        if stripped.startswith("//") or (not csv_text_lines and not stripped):
-            comment_lines.append(line)
-        else:
+        if stripped.startswith("//"):
+            comment_lines.append(stripped + "\n")
+        elif csv_text_lines or stripped:
             csv_text_lines.append(line)
 
     if not csv_text_lines:
