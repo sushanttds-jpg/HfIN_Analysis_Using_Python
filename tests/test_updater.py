@@ -273,6 +273,21 @@ class TestHfinUpdater(unittest.TestCase):
         with self.assertRaises(ValueError):
             record_holiday(self.csv_path, holiday_date="10-10-2026", dry_run=False)
 
+    def test_clean_csv_without_comments(self):
+        clean_content = (
+            "BUSINESS DATE,CLOSE PRICE,HIGH PRICE,LOW PRICE,TOTAL TRADED QUANTITY,TOTAL TRADED VALUE,TOTAL TRADES\n"
+            "2026-07-31,720,722,668.8,22713,16114369,527\n"
+        )
+        clean_csv = Path(self.temp_dir.name) / "clean_hfin.csv"
+        clean_csv.write_text(clean_content, encoding="utf-8")
+
+        success, msg = record_holiday(clean_csv, holiday_date="2026-10-21", dry_run=False)
+        self.assertTrue(success)
+        lines = clean_csv.read_text(encoding="utf-8").splitlines()
+        # Verify first line is standard CSV header (no leading blank lines or comment lines)
+        self.assertEqual(lines[0], "BUSINESS DATE,CLOSE PRICE,HIGH PRICE,LOW PRICE,TOTAL TRADED QUANTITY,TOTAL TRADED VALUE,TOTAL TRADES")
+        self.assertEqual(lines[1], "2026-10-21,MARKET CLOSED,WEEKEND,HOLIDAY,0,0,0")
+
 
 if __name__ == "__main__":
     unittest.main()
