@@ -299,9 +299,10 @@ def update_hfin_csv(
     # Write atomically
     temp_path = csv_path.with_suffix(".tmp")
     with open(temp_path, mode="w", encoding="utf-8", newline="") as f:
-        for c in updated_comments:
-            f.write(c.strip() + "\n")
-        f.write("\n\n")
+        if updated_comments:
+            for c in updated_comments:
+                f.write(c.strip() + "\n")
+            f.write("\n\n")
         writer = csv.DictWriter(f, fieldnames=fieldnames, lineterminator="\n")
         writer.writeheader()
         for r in all_rows:
