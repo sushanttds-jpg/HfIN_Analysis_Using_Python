@@ -22,8 +22,14 @@ A data science analysis and reproducible tracking project for **Hotel Forest Inn
 
 ```
 HfIN_Analysis_Using_Python/
-├── Stock Trading of Hotel Forest Inn Limited.csv  # Core historical OHLCV dataset
-├── Hotel_Forest_Analysis.py                       # Event study visualization script
+├── .github/workflows/
+│   ├── daily_stock_sync.yml                       # Scheduled GitHub Actions cron for daily market sync
+│   └── ci.yml                                     # Continuous integration (Ruff linting + tests)
+├── assets/                                        # Generated charts & reference figures
+├── docs/
+│   └── about_hfin.md                              # Company background & dataset metadata
+├── hfin_stock_data.csv                            # Core historical OHLCV dataset
+├── hfin_analysis.py                               # Event study visualization & return analysis script
 ├── hfin_event_study.png                           # Exported 5-panel dashboard chart
 ├── scripts/
 │   └── update_hfin.py                             # Automated daily price updater CLI
@@ -38,7 +44,7 @@ HfIN_Analysis_Using_Python/
 
 ## 🗄️ Dataset Schema
 
-The primary dataset file is [`Stock Trading of Hotel Forest Inn Limited.csv`](./Stock%20Trading%20of%20Hotel%20Forest%20Inn%20Limited.csv), stored in reverse chronological order (newest date first):
+The primary dataset file is [`hfin_stock_data.csv`](./hfin_stock_data.csv), stored in reverse chronological order (newest date first):
 
 | Column | Type | Description |
 |---|---|---|
@@ -112,7 +118,7 @@ To regenerate the 5-panel analytical dashboard (`hfin_event_study.png`):
 
 ```bash
 pip install -r requirements.txt
-python3 Hotel_Forest_Analysis.py
+python3 hfin_analysis.py
 ```
 
 ---
