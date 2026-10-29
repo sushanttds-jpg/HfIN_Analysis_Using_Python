@@ -1,0 +1,38 @@
+name: Daily HFIN Stock Sync
+
+on:
+  schedule:
+    # NEPSE trades Sunday through Thursday and closes at 3:00 PM NPT (UTC+5:45).
+    # 10:30 UTC = 4:15 PM NPT, ensuring day's trading is finalized and published.
+    - cron: '30 10 * * 0-4'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  sync-stock-data:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Run HFIN Updater
+        run: python scripts/update_hfin.py
+
+      - name: Commit and Push if Changed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add hfin_stock_data.csv
+          if git diff --cached --quiet; then
+            echo "No new stock data changes to commit."
+          else
+            git commit -m "data(hfin): automated daily market sync [$(date -u +'%Y-%m-%d')]"
+            git push
+          fi
