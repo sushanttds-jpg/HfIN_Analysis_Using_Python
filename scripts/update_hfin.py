@@ -29,7 +29,7 @@ except Exception:
     NEPAL_TZ = timezone(timedelta(hours=5, minutes=45), name="Asia/Kathmandu")
 
 # Defaults
-DEFAULT_CSV_PATH = Path(__file__).resolve().parent.parent / "Stock Trading of Hotel Forest Inn Limited.csv"
+DEFAULT_CSV_PATH = Path(__file__).resolve().parent.parent / "hfin_stock_data.csv"
 DEFAULT_FEED_URL = "https://shubhamnpk.github.io/yonepse/data/nepse_data.json"
 DEFAULT_MANIFEST_URL = "https://shubhamnpk.github.io/yonepse/data/ltp/manifest.json"
 DEFAULT_STATUS_URL = "https://shubhamnpk.github.io/yonepse/data/market/status.json"

@@ -3,7 +3,7 @@ import numpy as np
 import matplotlib.pyplot as ply
 from matplotlib.gridspec import GridSpec
 
-df = pd.read_csv('Stock Trading of Hotel Forest Inn Limited.csv',
+df = pd.read_csv('hfin_stock_data.csv',
                  comment='/',
                  parse_dates=['BUSINESS DATE'])
 df.columns = ['Date','Close','High','Low','Volume','TradedValue','Trades']
