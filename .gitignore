@@ -10,14 +10,20 @@ venv/
 env/
 ENV/
 
+# Temporary and swap files
+*.tmp
+*.swp
+*.swo
+*~
+
+# Raw OS screenshots (place formatted figures in assets/)
+Screenshot*.png
+
 # Jupyter
 .ipynb_checkpoints/
 
 # IDE & Editor files
 .vscode/
 .idea/
-*.swp
-*.swo
-*~
 .directory
 .DS_Store
