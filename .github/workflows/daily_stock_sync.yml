@@ -23,6 +23,7 @@ jobs:
           python-version: '3.12'
 
       - name: Run HFIN Updater
+        id: updater
         run: python scripts/update_hfin.py
 
       - name: Commit and Push if Changed
