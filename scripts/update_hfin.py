@@ -425,7 +425,14 @@ def main() -> None:
                 dry_run=args.dry_run
             )
         print(f"\nResult: {message}")
-        sys.exit(0 if success else 1)
+        if success:
+            sys.exit(0)
+        elif "already exists" in message:
+            # No new data available yet — not an error, just nothing to do.
+            logger.info("No new data from feed; exiting cleanly.")
+            sys.exit(0)
+        else:
+            sys.exit(1)
     except Exception as e:
         logger.error("Update failed: %s", e, exc_info=True)
         sys.exit(2)
