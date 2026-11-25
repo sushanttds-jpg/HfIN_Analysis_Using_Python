@@ -27,7 +27,7 @@ returns = df['DailyReturn'].dropna()
 
 events = {
     '2026-03-27': ('Balen Shah\nSworn In', 'green'),
-    '2026-04-22': ('Price Peak',            'red'),
+    '2026-04-21': ('Price Peak',            'red'),
 }
 
 
@@ -88,7 +88,7 @@ draw_events(ax1)
 
 vol_colors = [
     'steelblue' if d < pd.Timestamp('2026-03-27')
-    else 'seagreen' if d <= pd.Timestamp('2026-04-22')
+    else 'seagreen' if d <= pd.Timestamp('2026-04-21')
     else 'salmon'
     for d in df['Date']
 ]
@@ -181,13 +181,13 @@ for (row, col), cell in table.get_celld().items():
         cell.set_facecolor('blue')
         cell.set_text_props(color='white', fontweight='bold')
     elif row % 2 == 0:
-        cell.set_facecolor('white')
+        cell.set_facecolor('#f2f2f2')
     else:
         cell.set_facecolor('white')
 
 ax5.set_title("Summary Statistics", fontweight='bold')
 
-ply.tight_layout(rect=[0, 0, 1, 1.96])
+ply.tight_layout(rect=[0, 0, 1, 0.96])
 ply.savefig('hfin_event_study.png', dpi=150, bbox_inches='tight')
 ply.show()
-print("Saved ")
+print("Saved hfin_event_study.png")
