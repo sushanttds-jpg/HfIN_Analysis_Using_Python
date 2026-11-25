@@ -11,10 +11,11 @@ A data science analysis and reproducible tracking project for **Hotel Forest Inn
 |---|---|---|
 | Data starts (post-election) | Mar 12, 2026 | 111.8 |
 | Balen Shah sworn in (RSP majority) | Mar 27, 2026 | 289.1 |
-| Peak price | Apr 22, 2026 | 1,386.0 |
+| Peak price | Apr 21, 2026 | 1,386.0 |
 | Consolidated post-correction | Oct 6, 2026 | 550.5 |
+| Latest close in dataset | Nov 6, 2026 | 514.9 |
 | **Total peak gain** | | **+1,140%** |
-| Current correction from peak | | -60.3% |
+| Current correction from peak | | -62.9% |
 
 ---
 
