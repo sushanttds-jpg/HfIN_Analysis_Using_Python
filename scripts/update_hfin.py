@@ -9,6 +9,14 @@ Data Source:
   - Feed: https://shubhamnpk.github.io/yonepse/data/nepse_data.json
   - Docs: https://shubhamnpk.github.io/yonepse/pages/docs.html
   Note: This feed is maintained by a third party and is not an official NEPSE service.
+
+Status (2026-11-26):
+  The YONEPSE feed has been frozen since 2026-11-06T14:59 (all symbols,
+  not just HFIN). The updater is working as designed — its duplicate
+  guard correctly finds the latest date already recorded and adds
+  nothing, so the daily workflow has nothing to commit. Daily data
+  commits resume once a replacement live source is verified; see the
+  "Data Freshness" note in README.md.
 """
 
 import argparse

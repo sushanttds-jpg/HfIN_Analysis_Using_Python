@@ -30,12 +30,15 @@ HfIN_Analysis_Using_Python/
 ├── docs/
 │   └── about_hfin.md                              # Company background & dataset metadata
 ├── hfin_stock_data.csv                            # Core historical OHLCV dataset
+├── Stock Trading of Hotel Forest Inn Limited.csv  # Legacy raw file (see Data Freshness note)
 ├── hfin_analysis.py                               # Event study visualization & return analysis script
+├── hfin_stats.py                                  # Return statistics (mean, volatility, t-test) — stdlib only
 ├── hfin_event_study.png                           # Exported 5-panel dashboard chart
 ├── scripts/
 │   └── update_hfin.py                             # Automated daily price updater CLI
 ├── tests/
-│   └── test_updater.py                            # Comprehensive test suite (unittest)
+│   ├── test_updater.py                            # Comprehensive test suite (unittest)
+│   └── test_stats.py                              # Return-statistics unit tests
 ├── requirements.txt                               # Minimal Python dependencies
 ├── .gitignore                                     # Clean VCS exclusions
 └── README.md                                      # Documentation & usage guide
@@ -129,6 +132,13 @@ python3 hfin_analysis.py
 - **Official Source:** [Nepal Stock Exchange (NEPSE)](https://nepalstock.com.np) historical trading records.
 - **Automated Feed:** [YONEPSE Public JSON Data Feed](https://shubhamnpk.github.io/yonepse) ([docs](https://shubhamnpk.github.io/yonepse/pages/docs.html)).
   > *Disclaimer: The YONEPSE data feed is a community-maintained third-party scraper feed and is not an official service of NEPSE. The updater cross-checks finalization status and market closure before recording data.*
+
+### ⚠️ Data Freshness (as of Nov 26, 2026)
+
+- The YONEPSE feed **froze on Nov 6, 2026 (last update 14:59 NPT)** — every symbol, not just HFIN. The latest close in `hfin_stock_data.csv` is therefore Nov 6 (NPR 514.9).
+- The updater (`scripts/update_hfin.py`) and the daily GitHub Actions sync are **not broken**: the updater's duplicate guard correctly sees Nov 6 already recorded and adds nothing, so the workflow has nothing to commit.
+- A second file, `Stock Trading of Hotel Forest Inn Limited.csv`, holds manually added rows through Nov 24 (latest close NPR 475) and matches the core dataset on all 104 overlapping dates — but its Nov 7–24 rows are **not yet verified** (they record closes on Fri Nov 13 and Fri Nov 20 while marking Mon–Thu Nov 9–12 closed, which conflicts with NEPSE's Sun–Thu trading week), so they are **not merged** into `hfin_stock_data.csv` until cross-checked against a second source.
+- Next step: evaluate a replacement live source (e.g. the `nepsepy` client for nepalstock.com.np) and backfill Nov 7–25 from trading days only.
 
 ---
 
