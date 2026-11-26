@@ -3,6 +3,8 @@ import numpy as np
 import matplotlib.pyplot as ply
 from matplotlib.gridspec import GridSpec
 
+from hfin_stats import return_stats
+
 df = pd.read_csv('hfin_stock_data.csv',
                  comment='/',
                  parse_dates=['BUSINESS DATE'])
@@ -24,6 +26,9 @@ df['VolMA7']      = df['Volume'].rolling(7).mean()
 df['DailyReturn'] = df['Close'].pct_change() * 100
 df['CumReturn']   = (df['Close'] / df['Close'].iloc[0] - 1) * 100
 returns = df['DailyReturn'].dropna()
+stats = return_stats(df['Close'].tolist())
+print(f"Mean daily return: {stats['mean']:.2f}% | Volatility: {stats['volatility']:.2f}% | "
+      f"t-stat vs 0: {stats['t_stat']:.2f} (p = {stats['p_value']:.4f}, n = {stats['n']})")
 
 events = {
     '2026-03-27': ('Balen Shah\nSworn In', 'green'),
