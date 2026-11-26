@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """
 Unit tests for HFIN Daily Price Updater.
 Covers:
@@ -12,20 +11,17 @@ Covers:
   - Dry-run safety
 """
 
-import json
 import tempfile
 import unittest
 import urllib.error
 from pathlib import Path
-from unittest.mock import patch, MagicMock
+from unittest.mock import patch
 
 from scripts.update_hfin import (
-    update_hfin_csv,
-    record_holiday,
-    validate_hfin_record,
-    find_hfin_record,
-    fetch_json,
     read_existing_csv,
+    record_holiday,
+    update_hfin_csv,
+    validate_hfin_record,
 )
 
 SAMPLE_CSV_CONTENT = """//Data taken From : https://nepalstock.com.np/stock-trading
@@ -252,7 +248,7 @@ class TestHfinUpdater(unittest.TestCase):
         # Header comments updated
         self.assertTrue(any("2026-10-10" in line for line in lines[:3]))
         # First data row is the holiday row
-        header_idx = [i for i, line in enumerate(lines) if line.startswith("BUSINESS DATE")][0]
+        header_idx = next(i for i, line in enumerate(lines) if line.startswith("BUSINESS DATE"))
         first_row = lines[header_idx + 1]
         self.assertEqual(first_row, "2026-10-10,MARKET CLOSED,WEEKEND,HOLIDAY,0,0,0")
 
@@ -281,7 +277,7 @@ class TestHfinUpdater(unittest.TestCase):
         clean_csv = Path(self.temp_dir.name) / "clean_hfin.csv"
         clean_csv.write_text(clean_content, encoding="utf-8")
 
-        success, msg = record_holiday(clean_csv, holiday_date="2026-10-21", dry_run=False)
+        success, _msg = record_holiday(clean_csv, holiday_date="2026-10-21", dry_run=False)
         self.assertTrue(success)
         lines = clean_csv.read_text(encoding="utf-8").splitlines()
         # Verify first line is standard CSV header (no leading blank lines or comment lines)

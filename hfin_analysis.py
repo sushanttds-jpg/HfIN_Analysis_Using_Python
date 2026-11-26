@@ -1,6 +1,5 @@
-import pandas as pd
-import numpy as np
 import matplotlib.pyplot as ply
+import pandas as pd
 from matplotlib.gridspec import GridSpec
 
 from hfin_stats import return_stats
@@ -79,8 +78,8 @@ ax1.annotate(f'Peak: NPR {peak_price:.0f}',
              xy=(peak_date, peak_price),
              xytext=(15, 20), textcoords='offset points',
              fontsize=9, color='red', fontweight='bold',
-             bbox=dict(facecolor='white', edgecolor='red',
-                       alpha=0.8))
+             bbox={'facecolor': 'white', 'edgecolor': 'red',
+                       'alpha': 0.8})
 
 ax1.set_title("Closing Price — 11× Pump Followed by Correction",
               fontweight='bold', fontsize=11)
@@ -107,7 +106,7 @@ ax2.annotate(f"{df.loc[max_vol_idx,'Volume']:,.0f} shares\n(distribution?)",
              xy=(df.loc[max_vol_idx,'Date'], df.loc[max_vol_idx,'Volume']),
              xytext=(-50, -40), textcoords='offset points',
              fontsize=7.5, color='red',
-             arrowprops=dict(arrowstyle='->', color='red'))
+             arrowprops={'arrowstyle': '->', 'color': 'red'})
 
 ax2.set_title("Trading Volume by Phase", fontweight='bold')
 ax2.set_ylabel("Shares Traded")
@@ -144,7 +143,7 @@ ax4.annotate(f'+{peak_cum:.0f}%\nfrom start',
              xy=(df.loc[df['CumReturn'].idxmax(), 'Date'], peak_cum),
              xytext=(-60, -30), textcoords='offset points',
              fontsize=8.5, color='seagreen', fontweight='bold',
-             arrowprops=dict(arrowstyle='->', color='seagreen'))
+             arrowprops={'arrowstyle': '->', 'color': 'seagreen'})
 
 ax4.set_title("Cumulative Return from First Trading Day",
               fontweight='bold')
@@ -159,8 +158,8 @@ price_now   = df['Close'].iloc[-1]
 price_start = df['Close'].iloc[0]
 
 rows = [
-    ['Period', f"{df['Date'].iloc[0].strftime('%d %b')} — "
-               f"{df['Date'].iloc[-1].strftime('%d %b %Y')}"],
+    ['Period', (f"{df['Date'].iloc[0].strftime('%d %b')} — "
+               f"{df['Date'].iloc[-1].strftime('%d %b %Y')}")],
     ['Starting Price',  f"NPR {price_start:.2f}"],
     ['Current Price',   f"NPR {price_now:.2f}"],
     ['Peak Price',      f"NPR {peak_price:.2f}"],

@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """
 HFIN Daily Price Updater
 -------------------------
@@ -26,14 +25,14 @@ import logging
 import sys
 import urllib.error
 import urllib.request
-from datetime import datetime, timezone, timedelta
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any
 
 try:
     from zoneinfo import ZoneInfo
     NEPAL_TZ = ZoneInfo("Asia/Kathmandu")
-except Exception:
+except Exception:  # noqa: BLE001 - any ZoneInfo failure falls back to fixed +05:45 offset
     NEPAL_TZ = timezone(timedelta(hours=5, minutes=45), name="Asia/Kathmandu")
 
 # Defaults
@@ -72,10 +71,10 @@ def fetch_json(url: str, timeout: int = 15) -> Any:
         raise ValueError(f"Malformed JSON from {url}: {e}") from e
 
 
-def find_hfin_record(data: Any) -> Dict[str, Any]:
+def find_hfin_record(data: Any) -> dict[str, Any]:
     """Locate the exact HFIN record in the dataset array."""
     if not isinstance(data, list):
-        raise ValueError(f"Expected JSON list in nepse_data.json, got {type(data).__name__}")
+        raise TypeError(f"Expected JSON list in nepse_data.json, got {type(data).__name__}")
     
     matches = [item for item in data if isinstance(item, dict) and item.get("symbol") == EXPECTED_SYMBOL]
     if not matches:
@@ -85,7 +84,7 @@ def find_hfin_record(data: Any) -> Dict[str, Any]:
     return matches[0]
 
 
-def parse_nepal_date(timestamp_str: Optional[str]) -> Tuple[str, datetime]:
+def parse_nepal_date(timestamp_str: str | None) -> tuple[str, datetime]:
     """Parse an ISO timestamp and convert to date string in Asia/Kathmandu."""
     if not timestamp_str:
         raise ValueError("Missing 'last_updated' timestamp in market data record.")
@@ -107,7 +106,7 @@ def parse_nepal_date(timestamp_str: Optional[str]) -> Tuple[str, datetime]:
     return date_str, dt
 
 
-def validate_hfin_record(record: Dict[str, Any]) -> Dict[str, Any]:
+def validate_hfin_record(record: dict[str, Any]) -> dict[str, Any]:
     """Validate all required fields, company name, prices, and ranges."""
     name = record.get("name")
     if name != EXPECTED_NAME:
@@ -157,7 +156,7 @@ def check_market_finalization(
     target_date: str,
     manifest_url: str = DEFAULT_MANIFEST_URL,
     status_url: str = DEFAULT_STATUS_URL
-) -> Tuple[bool, str]:
+) -> tuple[bool, str]:
     """
     Verify whether the target date's trading data represents a finalized close
     rather than an intraday snapshot.
@@ -167,7 +166,7 @@ def check_market_finalization(
         is_open = market_status.get("is_open", False)
         if is_open:
             return False, "Market is currently OPEN (intraday trading session active)."
-    except Exception as e:
+    except Exception as e:  # noqa: BLE001 - any feed/network failure means "cannot verify", keep going
         logger.warning("Could not verify market open/closed status: %s", e)
 
     try:
@@ -176,13 +175,13 @@ def check_market_finalization(
         latest_status = manifest.get("latestStatus")
         if finalized_through and target_date <= finalized_through:
             return True, f"Verified finalized by manifest through {finalized_through} (status: {latest_status})."
-    except Exception as e:
+    except Exception as e:  # noqa: BLE001 - any feed/network failure means "cannot verify", keep going
         logger.warning("Could not verify manifest finalization: %s", e)
 
     return True, "Market is closed; recording end-of-day summary."
 
 
-def read_existing_csv(csv_path: Path) -> Tuple[List[str], List[Dict[str, str]]]:
+def read_existing_csv(csv_path: Path) -> tuple[list[str], list[dict[str, str]]]:
     """
     Read the existing CSV, separating comment lines and header from data rows.
     Returns (comment_lines, parsed_rows).
@@ -190,13 +189,13 @@ def read_existing_csv(csv_path: Path) -> Tuple[List[str], List[Dict[str, str]]]:
     if not csv_path.exists():
         raise FileNotFoundError(f"CSV file not found at: {csv_path}")
 
-    comment_lines: List[str] = []
-    rows: List[Dict[str, str]] = []
+    comment_lines: list[str] = []
+    rows: list[dict[str, str]] = []
 
     with open(csv_path, mode="r", encoding="utf-8") as f:
         lines = f.readlines()
 
-    csv_text_lines: List[str] = []
+    csv_text_lines: list[str] = []
     for line in lines:
         stripped = line.strip()
         if stripped.startswith("//"):
@@ -208,8 +207,7 @@ def read_existing_csv(csv_path: Path) -> Tuple[List[str], List[Dict[str, str]]]:
         raise ValueError("CSV contains no header or data lines.")
 
     reader = csv.DictReader(csv_text_lines)
-    for r in reader:
-        rows.append(r)
+    rows.extend(reader)
 
     return comment_lines, rows
 
@@ -227,7 +225,7 @@ def update_hfin_csv(
     manifest_url: str = DEFAULT_MANIFEST_URL,
     status_url: str = DEFAULT_STATUS_URL,
     dry_run: bool = False
-) -> Tuple[bool, str]:
+) -> tuple[bool, str]:
     """
     Execute the full update pipeline:
       1. Read existing CSV
@@ -287,7 +285,7 @@ def update_hfin_csv(
         return True, msg
 
     # Update comment line 2 with newest date if present
-    updated_comments: List[str] = []
+    updated_comments: list[str] = []
     for line in comment_lines:
         if line.startswith("//has updated till"):
             updated_comments.append(f"//has updated till 2026-03-11 to {record_date}\n")
@@ -308,8 +306,7 @@ def update_hfin_csv(
     temp_path = csv_path.with_suffix(".tmp")
     with open(temp_path, mode="w", encoding="utf-8", newline="") as f:
         if updated_comments:
-            for c in updated_comments:
-                f.write(c.strip() + "\n")
+            f.writelines(c.strip() + "\n" for c in updated_comments)
             f.write("\n\n")
         writer = csv.DictWriter(f, fieldnames=fieldnames, lineterminator="\n")
         writer.writeheader()
@@ -324,9 +321,9 @@ def update_hfin_csv(
 
 def record_holiday(
     csv_path: Path,
-    holiday_date: Optional[str] = None,
+    holiday_date: str | None = None,
     dry_run: bool = False
-) -> Tuple[bool, str]:
+) -> tuple[bool, str]:
     """
     Record a non-trading day (weekend or public holiday) in the CSV dataset.
     Follows repository convention:
@@ -376,7 +373,7 @@ def record_holiday(
     all_rows.sort(key=lambda x: x["BUSINESS DATE"], reverse=True)
     newest_date = all_rows[0]["BUSINESS DATE"]
 
-    updated_comments: List[str] = []
+    updated_comments: list[str] = []
     for line in comment_lines:
         if line.startswith("//has updated till"):
             updated_comments.append(f"//has updated till 2026-03-11 to {newest_date}\n")
@@ -391,8 +388,7 @@ def record_holiday(
     temp_path = csv_path.with_suffix(".tmp")
     with open(temp_path, mode="w", encoding="utf-8", newline="") as f:
         if updated_comments:
-            for c in updated_comments:
-                f.write(c.strip() + "\n")
+            f.writelines(c.strip() + "\n" for c in updated_comments)
             f.write("\n\n")
         writer = csv.DictWriter(f, fieldnames=fieldnames, lineterminator="\n")
         writer.writeheader()
@@ -441,8 +437,8 @@ def main() -> None:
             sys.exit(0)
         else:
             sys.exit(1)
-    except Exception as e:
-        logger.error("Update failed: %s", e, exc_info=True)
+    except Exception:
+        logger.exception("Update failed")
         sys.exit(2)
 
 
