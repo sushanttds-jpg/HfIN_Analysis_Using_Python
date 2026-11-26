@@ -146,7 +146,7 @@ python3 hfin_analysis.py
 
 1. **Pre-Event Speculation:** The stock price surged 2.3× *before* the government was formally sworn in—the market priced political anticipation rather than earnings fundamentals.
 2. **Distribution Signal at Peak:** April 20 recorded the highest single-day volume (292,797 shares) right at the price peak, matching a classic institutional distribution pattern into retail momentum buying.
-3. **Thin-Float Behavior:** Normal daily trading volume was 10,000–40,000 shares; daily return volatility reached 6.43%, confirming thin-float manipulation susceptibility.
+3. **Thin-Float Behavior:** Normal daily trading volume was 10,000–40,000 shares; daily return volatility is 5.90% over the full sample, confirming thin-float manipulation susceptibility.
 4. **Sentiment Driven:** Movement was driven by sentiment surrounding Nepal's first majority government since 1999 rather than changes in hotel revenue or tourism fundamentals.
 
 ---
