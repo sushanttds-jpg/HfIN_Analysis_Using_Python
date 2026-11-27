@@ -10,12 +10,14 @@ A data science analysis and reproducible tracking project for **Hotel Forest Inn
 | Event | Date | Price (NPR) |
 |---|---|---|
 | Data starts (post-election) | Mar 12, 2026 | 111.8 |
-| Balen Shah sworn in (RSP majority) | Mar 27, 2026 | 289.1 |
+| Balen Shah sworn in (RSP majority) | Mar 29, 2026 | 289.1 |
 | Peak price | Apr 21, 2026 | 1,386.0 |
 | Consolidated post-correction | Oct 6, 2026 | 550.5 |
 | Latest close in dataset | Nov 6, 2026 | 514.9 |
 | **Total peak gain** | | **+1,140%** |
 | Current correction from peak | | -62.9% |
+
+*The swearing-in was Fri Mar 27, 2026, a NEPSE non-trading day — NPR 289.1 is the close of the first trading session after it (Sun Mar 29).*
 
 ---
 
@@ -146,7 +148,7 @@ python3 hfin_analysis.py
 
 1. **Pre-Event Speculation:** The stock price surged 2.3× *before* the government was formally sworn in—the market priced political anticipation rather than earnings fundamentals.
 2. **Distribution Signal at Peak:** April 20 recorded the highest single-day volume (292,797 shares) right at the price peak, matching a classic institutional distribution pattern into retail momentum buying.
-3. **Thin-Float Behavior:** Normal daily trading volume was 10,000–40,000 shares; daily return volatility reached 6.43%, confirming thin-float manipulation susceptibility.
+3. **Thin-Float Behavior:** Normal daily trading volume was 10,000–40,000 shares; daily return volatility is 5.90% (full-sample standard deviation over 105 trading days), confirming thin-float manipulation susceptibility.
 4. **Sentiment Driven:** Movement was driven by sentiment surrounding Nepal's first majority government since 1999 rather than changes in hotel revenue or tourism fundamentals.
 
 ---
