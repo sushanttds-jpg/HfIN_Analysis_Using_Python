@@ -35,12 +35,14 @@ HfIN_Analysis_Using_Python/
 ├── Stock Trading of Hotel Forest Inn Limited.csv  # Legacy raw file (see Data Freshness note)
 ├── hfin_analysis.py                               # Event study visualization & return analysis script
 ├── hfin_stats.py                                  # Return statistics (mean, volatility, t-test) — stdlib only
+├── hfin_sqlite.py                                 # SQLite mirror of the dataset + SQL queries — stdlib only
 ├── hfin_event_study.png                           # Exported 5-panel dashboard chart
 ├── scripts/
 │   └── update_hfin.py                             # Automated daily price updater CLI
 ├── tests/
 │   ├── test_updater.py                            # Comprehensive test suite (unittest)
 │   └── test_stats.py                              # Return-statistics unit tests
+│   └── test_sqlite.py                             # SQLite storage + query tests
 ├── requirements.txt                               # Minimal Python dependencies
 ├── .gitignore                                     # Clean VCS exclusions
 └── README.md                                      # Documentation & usage guide
@@ -61,6 +63,18 @@ The primary dataset file is [`hfin_stock_data.csv`](./hfin_stock_data.csv), stor
 | `TOTAL TRADED QUANTITY` | `integer` | Total shares exchanged during the session |
 | `TOTAL TRADED VALUE` | `numeric` | Total transaction turnover in NPR |
 | `TOTAL TRADES` | `integer` | Total executed trade count |
+
+---
+
+## 🗄️ SQLite Mirror
+
+The dataset can be mirrored into SQLite for SQL queries — no pandas needed:
+
+```bash
+python3 hfin_sqlite.py --summary
+```
+
+This builds `hfin.db` (gitignored) from `hfin_stock_data.csv` and prints trading days, date range, peak and latest close, plus average close per month. `hfin_sqlite.py` is standard library only (`sqlite3` + `csv`); the CSV stays the source of truth and the database is rebuilt from it at any time.
 
 ---
 
@@ -113,6 +127,7 @@ Tests cover:
 - Malformed JSON handling
 - Price range sanity checks (negative prices, inverted high/low)
 - Market-open / unfinalized state protection
+- SQLite storage and queries (`hfin_sqlite.py`)
 - Network connection error handling
 - Dry-run non-mutation guarantee
 
