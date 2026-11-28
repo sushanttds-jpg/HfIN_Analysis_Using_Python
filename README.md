@@ -35,6 +35,7 @@ HfIN_Analysis_Using_Python/
 ├── Stock Trading of Hotel Forest Inn Limited.csv  # Legacy raw file (see Data Freshness note)
 ├── hfin_analysis.py                               # Event study visualization & return analysis script
 ├── hfin_stats.py                                  # Return statistics (mean, volatility, t-test) — stdlib only
+├── hfin_ml.py                                   # Next-day direction baseline (logistic regression, Scikit-learn)
 ├── hfin_sqlite.py                                 # SQLite mirror of the dataset + SQL queries — stdlib only
 ├── hfin_event_study.png                           # Exported 5-panel dashboard chart
 ├── scripts/
@@ -43,6 +44,7 @@ HfIN_Analysis_Using_Python/
 │   ├── test_updater.py                            # Comprehensive test suite (unittest)
 │   └── test_stats.py                              # Return-statistics unit tests
 │   └── test_sqlite.py                             # SQLite storage + query tests
+│   └── test_ml.py                                 # Next-day direction baseline tests
 ├── requirements.txt                               # Minimal Python dependencies
 ├── .gitignore                                     # Clean VCS exclusions
 └── README.md                                      # Documentation & usage guide
@@ -75,6 +77,27 @@ python3 hfin_sqlite.py --summary
 ```
 
 This builds `hfin.db` (gitignored) from `hfin_stock_data.csv` and prints trading days, date range, peak and latest close, plus average close per month. `hfin_sqlite.py` is standard library only (`sqlite3` + `csv`); the CSV stays the source of truth and the database is rebuilt from it at any time.
+
+---
+
+## 🤖 ML Baseline — Next-Day Direction
+
+First ML step: predict whether tomorrow's close is up or down, from price history only. Features are yesterday's return and the 5-day mean return; the model is a Scikit-learn logistic regression on a chronological train/test split (first 80% train, last 20% test — no shuffling, this is a time series).
+
+```bash
+pip install -r requirements.txt
+python3 hfin_ml.py
+```
+
+Result on the current dataset (106 trading days, 100 samples; test window Jul 26 – Nov 6, 2026):
+
+| Model | Test accuracy |
+|---|---|
+| Logistic regression | 80.0% |
+| Persistence ("tomorrow moves like today") | 75.0% |
+| Majority (always predict down) | 80.0% |
+
+Honest reading: the model only **ties** the always-down baseline, and the test window was mostly down days (only 4 of 20 up). So there is **no real signal yet** — daily HFIN moves look close to unpredictable from price history alone on this small sample. That is the finding, not a failure: the baseline exists so the next model (more features, more data once the feed unfreezes) has something to beat. See `hfin_ml.py` for the split, features, and baselines.
 
 ---
 
@@ -128,6 +151,7 @@ Tests cover:
 - Price range sanity checks (negative prices, inverted high/low)
 - Market-open / unfinalized state protection
 - SQLite storage and queries (`hfin_sqlite.py`)
+- Next-day direction baseline: logistic regression vs persistence and majority baselines (`hfin_ml.py`)
 - Network connection error handling
 - Dry-run non-mutation guarantee
 
